@@ -1,0 +1,30 @@
+# LaTeX
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
+*.lof
+*.lot
+*.idx
+*.ind
+*.ilg
+*.pdf
+*.dvi
+*.ps
+*.nav
+*.snm
+*.vrb
+
+# minted
+_minted*
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+build/

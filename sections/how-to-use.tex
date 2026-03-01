@@ -1,0 +1,241 @@
+\section{How to use}
+This report template is designed to help you create a professional-looking report with ease. Below are the steps to get started:
+\subsection{Lists}
+You can create itemized lists as follows:
+\begin{itemize}
+  \item First item in an itemized list.
+  \item Second item in an itemized list.
+\end{itemize}
+You can create enumerated lists as follows:
+\begin{enumerate}
+  \item First item in an enumerated list.
+  \item Second item in an enumerated list.
+\end{enumerate}
+\subsection{Tables}
+Note that you can use \texttt{\textbackslash FloatBarrier} to prevent floats from moving past a certain point in the document. In other words, all figures and tables before \texttt{\textbackslash FloatBarrier} will appear before it in the final output.
+\begin{table}
+  \centering
+  \caption{Example of a simple, modern table}
+  \label{tab:simple-modern}
+  \begin{tabular}{lcc}
+    \toprule
+    Item & Quantity & Price (USD) \\
+    \midrule
+    Notebook & 2 & 12.50 \\
+    Pen & 5 & 1.20 \\
+    Backpack & 1 & 45.00 \\
+    \midrule
+    Total &  & 71.90 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{table}
+  \centering
+  \caption{Sample formulas using tblr}
+  \label{tab:formulas}
+  \begin{tblr}{
+      colspec = {l X[c] X[c]},
+      row{1} = {font=\bfseries},
+      hlines, vlines
+    }
+    Formula & Expression & Notes \\
+    Pythagorean & $a^2 + b^2 = c^2$ & Right triangle relation \\
+    Quadratic roots & $x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$ & Discriminant $\Delta = b^2 - 4ac$ \\
+    Euler identity & $e^{i\pi} + 1 = 0$ & Fundamental constants \\
+    Derivative & $\frac{d}{dx} x^n = n x^{n-1}$ & $n \in \mathbb{N}$ \\
+    Integral & $\int_0^{\infty} e^{-x}\,dx = 1$ & Convergent improper integral \\
+    Summation & $\sum_{k=1}^n k = \frac{n(n+1)}{2}$ & Arithmetic series \\
+  \end{tblr}
+\end{table}
+
+\begin{table}
+  \centering
+  \caption{Comprehensive benchmark comparison}
+  \label{tab:complex-table}
+  \begin{tblr}{
+      colspec = {l *{4}{X[c]}},
+      rowhead = 2,
+      hlines,
+      vlines,
+      cell{1}{1-5} = {bg=gray!20,font=\bfseries},
+      cell{2}{1-5} = {bg=gray!10,font=\itshape},
+      cell{3}{1} = {r=2}{font=\bfseries},
+      cell{5}{1} = {r=3}{font=\bfseries},
+      cell{8}{2} = {c=2}{bg=yellow!20},
+    }
+    Category & Impl A & Impl B & Impl C & Impl D \\
+    Metric & Time (ms) & Memory (MB) & Throughput (ops/s) & Energy (J) \\
+    Core Ops & 12.4 & 128 & 4200 & 0.84 \\
+    & 11.9 & 130 & 4500 & 0.81 \\
+    I/O Bound & 55.0 & 256 & 1100 & 2.10 \\
+    & 53.2 & 250 & 1300 & 2.05 \\
+    & 54.7 & 248 & 1250 & 2.00 \\
+    Summary & \SetCell{c=2}{Avg speed-up: 1.05x} & Peak: 4500 & Min energy: 0.81 \\
+    Notes & \SetCell{c=4,halign=l}{Time: lower is better; Throughput: higher is better; Energy: lower is better.} \\
+  \end{tblr}
+\end{table}
+\FloatBarrier
+\begin{table}
+  \centering
+  \caption{Scaled wide performance matrix}
+  \label{tab:wide-matrix}
+  \resizebox{0.7\textwidth}{!}{%
+    \begin{tabular}{lrrrrrrrrrrrr}
+      \toprule
+      Component & M1 & M2 & M3 & M4 & M5 & M6 & M7 & M8 & M9 & M10 & M11 & Avg \\
+      \midrule
+      Parser        & 12.3 & 11.9 & 12.1 & 12.0 & 11.8 & 12.4 & 12.2 & 11.7 & 12.5 & 12.3 & 12.0 & 12.11 \\
+      Lexer         & 5.4  & 5.2  & 5.3  & 5.5  & 5.1  & 5.4  & 5.3  & 5.2  & 5.6  & 5.4  & 5.3  & 5.36  \\
+      Optimizer     & 33.2 & 32.8 & 33.5 & 33.0 & 32.7 & 33.8 & 33.3 & 32.9 & 34.0 & 33.1 & 33.4 & 33.24 \\
+      CodeGen       & 21.5 & 21.0 & 21.7 & 21.3 & 21.2 & 21.9 & 21.4 & 21.1 & 22.0 & 21.6 & 21.5 & 21.47 \\
+      JIT           & 44.0 & 43.5 & 44.2 & 43.8 & 43.6 & 44.5 & 44.1 & 43.7 & 44.7 & 44.3 & 44.0 & 44.04 \\
+      Profiler      & 8.9  & 8.7  & 8.8  & 8.6  & 8.5  & 9.0  & 8.8  & 8.6  & 9.1  & 8.9  & 8.8  & 8.80  \\
+      GC            & 57.0 & 56.2 & 57.8 & 56.9 & 56.0 & 58.1 & 57.5 & 56.4 & 58.3 & 57.2 & 57.1 & 57.05 \\
+      Scheduler     & 14.2 & 13.9 & 14.5 & 14.1 & 13.8 & 14.6 & 14.3 & 13.7 & 14.7 & 14.4 & 14.2 & 14.22 \\
+      Net I/O       & 62.5 & 61.8 & 63.1 & 62.2 & 61.5 & 63.4 & 62.7 & 61.6 & 63.6 & 62.8 & 62.4 & 62.51 \\
+      Disk I/O      & 71.0 & 70.2 & 71.9 & 71.1 & 70.0 & 72.3 & 71.5 & 70.4 & 72.6 & 71.7 & 71.2 & 71.35 \\
+      Cache Layer   & 9.3  & 9.1  & 9.4  & 9.2  & 9.0  & 9.5  & 9.3  & 9.1  & 9.6  & 9.4  & 9.2  & 9.28  \\
+      Auth Module   & 4.8  & 4.7  & 4.9  & 4.8  & 4.6  & 5.0  & 4.9  & 4.7  & 5.1  & 4.9  & 4.8  & 4.85  \\
+      API Layer     & 18.6 & 18.2 & 18.9 & 18.4 & 18.1 & 19.1 & 18.7 & 18.3 & 19.3 & 18.8 & 18.5 & 18.64 \\
+      Frontend      & 25.2 & 24.8 & 25.6 & 25.0 & 24.7 & 25.9 & 25.4 & 24.9 & 26.1 & 25.5 & 25.3 & 25.30 \\
+      Monitoring    & 6.7  & 6.6  & 6.8  & 6.5  & 6.4  & 6.9  & 6.8  & 6.5  & 7.0  & 6.8  & 6.7  & 6.70  \\
+      Alerting      & 3.4  & 3.3  & 3.5  & 3.4  & 3.2  & 3.6  & 3.5  & 3.3  & 3.7  & 3.5  & 3.4  & 3.45  \\
+      Billing       & 11.2 & 10.9 & 11.4 & 11.1 & 10.8 & 11.6 & 11.3 & 10.9 & 11.7 & 11.5 & 11.2 & 11.24 \\
+      Analytics     & 39.4 & 38.7 & 40.1 & 39.2 & 38.5 & 40.6 & 39.8 & 38.6 & 40.9 & 39.9 & 39.3 & 39.55 \\
+      ML Inference  & 83.0 & 82.1 & 84.2 & 83.4 & 81.9 & 85.0 & 84.1 & 82.3 & 85.4 & 84.3 & 83.6 & 83.93 \\
+      Security Scan & 52.1 & 51.4 & 52.9 & 52.0 & 51.0 & 53.3 & 52.5 & 51.3 & 53.6 & 52.7 & 52.2 & 52.36 \\
+      \midrule
+      Median        & 21.5 & 21.0 & 21.7 & 21.3 & 21.2 & 21.9 & 21.4 & 21.1 & 22.0 & 21.6 & 21.5 & 21.47 \\
+      95th pct      & 82.0 & 81.2 & 83.1 & 82.4 & 80.9 & 84.0 & 83.2 & 81.3 & 84.4 & 83.3 & 82.6 & 82.60 \\
+      Min           & 3.4  & 3.3  & 3.5  & 3.4  & 3.2  & 3.6  & 3.5  & 3.3  & 3.6  & 3.5  & 3.4  & 3.45  \\
+      Max           & 83.0 & 82.1 & 84.2 & 83.4 & 81.9 & 85.0 & 84.1 & 82.3 & 85.4 & 84.3 & 83.6 & 84.52 \\
+      \bottomrule
+    \end{tabular}%
+  }
+  \vspace{10pt}
+
+  \footnotesize Times shown in ms; lower is better. Columns M1-M11 represent sequential benchmark runs.
+\end{table}
+\subsection{Mathematic equations}
+For inline math, you can wrap your equation in \texttt{\textbackslash( ...\textbackslash)}, like so: \(E=mc^2\). For displayed equations, there are several options.
+
+The following are unnumbered displayed equations representing the Fourier Transform and its inverse using the modern \texttt{\textbackslash[...\textbackslash]} syntax.
+\[
+  \mathcal{F}\{f(t)\}=F(\omega)=\int_{-\infty}^{\infty} f(t)\,e^{-i\omega t}\,dt
+\]
+\[
+  f(t)=\frac{1}{2\pi}\int_{-\infty}^{\infty} F(\omega)\,e^{i\omega t}\,d\omega
+\]
+
+For a single numbered equation, use the \texttt{equation} environment. You can add a \texttt{\textbackslash label} to reference it later in your text.
+\begin{equation}
+  \label{eq:euler}
+  e^{i\pi} + 1 = 0
+\end{equation}
+
+For multiple aligned equations, the \texttt{align} environment. Use \texttt{\&} to mark the alignment point.
+\begin{align}
+  \label{eq:maxwell1}
+  \nabla \cdot \mathbf{E} &= \frac{\rho}{\varepsilon_0} \\
+  \label{eq:maxwell2}
+  \nabla \cdot \mathbf{B} &= 0 \\
+  \label{eq:maxwell3}
+  \nabla \times \mathbf{E} &= -\frac{\partial \mathbf{B}}{\partial t} \\
+  \label{eq:maxwell4}
+  \nabla \times \mathbf{B} &= \mu_0 \left( \mathbf{J} + \varepsilon_0 \frac{\partial \mathbf{E}}{\partial t} \right)
+\end{align}
+You can refer to Euler's identity as Equation~\ref{eq:euler} and the first Maxwell equation as Equation~\ref{eq:maxwell1}.
+\subsection{Source code}
+You can include source code snippets using the \texttt{code} environment. Specify the programming language as an argument to enable syntax highlighting. For example, here is a Python code snippet:
+\begin{code}{python}
+  print("Hello world!")
+  for i in range(3):
+  print(i)
+\end{code}
+
+Here is a C code snippet demonstrating a simple ``Hello, world!'' program along with a function to test long line wrapping:
+\begin{code}{c}
+  #include <stdio.h>
+
+  int main(void) {
+    printf("Hello, world!\n");
+    return 0;
+  }
+  void long_line_test(void){printf("LONG_LINE_TEST: 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz--REPEAT--0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz :: punctuation !@#$%^&*()_+-={}[]|:;\"'<>,.?/ \\ \\ \\ testing very very very very very very long single line for wrap behavior in LaTeX code environment end.\n");}
+\end{code}
+
+\subsection{Pseudocode and algorithms}
+You can include pseudocode or algorithms using the \texttt{algorithm} environment. Here is an example of a disjoint decomposition algorithm:
+\begin{algorithm}
+  \SetKwData{Left}{left}\SetKwData{This}{this}\SetKwData{Up}{up}
+  \SetKwFunction{Union}{Union}\SetKwFunction{FindCompress}{FindCompress}
+  \SetKwInOut{Input}{input}\SetKwInOut{Output}{output}
+  \Input{A bitmap $Im$ of size $w\times l$}
+  \Output{A partition of the bitmap}
+  \BlankLine
+  \emph{special treatment of the first line}\;
+  \For{$i\leftarrow 2$ \KwTo $l$}{
+    \emph{special treatment of the first element of line $i$}\;
+    \For{$j\leftarrow 2$ \KwTo $w$}{\label{forins}
+      \Left$\leftarrow$ \FindCompress{$Im[i,j-1]$}\;
+      \Up$\leftarrow$ \FindCompress{$Im[i-1,]$}\;
+      \This$\leftarrow$ \FindCompress{$Im[i,j]$}\;
+      \If(\tcp*[h]{O(\Left,\This)==1}){\Left compatible with \This}{\label{lt}
+        \lIf{\Left $<$ \This}{\Union{\Left,\This}}
+        \lElse{\Union{\This,\Left}}
+      }
+      \If(\tcp*[f]{O(\Up,\This)==1}){\Up compatible with \This}{\label{ut}
+        \lIf{\Up $<$ \This}{\Union{\Up,\This}}
+        \tcp{\This is put under \Up to keep tree as flat as possible}\label{cmt}
+        \lElse{\Union{\This,\Up}}\tcp*[h]{\This linked to \Up}\label{lelse}
+      }
+    }
+    \lForEach{element $e$ of the line $i$}{\FindCompress{p}}
+  }
+  \caption{disjoint decomposition}\label{algo_disjdecomp}
+\end{algorithm}
+
+\subsection{Another Algorithm Example}
+Here is another example demonstrating Dijkstra's algorithm for finding the shortest paths in a graph. This example showcases initialization, a main loop, and conditional logic within the algorithm.
+
+\begin{algorithm}[H]
+  \caption{Dijkstra's Algorithm for Shortest Paths}
+  \label{algo:dijkstra}
+  \SetKwInOut{Input}{Input}
+  \SetKwInOut{Output}{Output}
+  \SetKwData{Dist}{dist}
+  \SetKwData{Prev}{prev}
+  \SetKwData{Queue}{Q}
+  \SetKwFunction{ExtractMin}{Extract-Min}
+  \SetKwFunction{DecreaseKey}{Decrease-Key}
+
+  \Input{A weighted graph $G=(V, E)$ with non-negative weights, and a source vertex $s \in V$}
+  \Output{The shortest path distances from $s$ to every other vertex $v \in V$}
+
+  \BlankLine
+  \tcp{Initialization for all vertices}
+  \ForEach{vertex $v \in V$}{
+    \Dist$[v] \leftarrow \infty$\;
+    \Prev$[v] \leftarrow \text{undefined}$\;
+  }
+  \Dist$[s] \leftarrow 0$\;
+  \Queue $\leftarrow V$\tcp*{A min-priority queue of vertices, keyed by their \Dist values}
+
+  \BlankLine
+  \tcp{Main loop to find shortest paths}
+  \While{\Queue is not empty}{
+    $u \leftarrow$ \ExtractMin{\Queue}\tcp*{Vertex with smallest distance}
+    \ForEach{neighbor $v$ of $u$}{
+      \tcp{Relaxation step}
+      $alt \leftarrow \Dist[u] + \text{weight}(u, v)$\;
+      \If{$alt < \Dist[v]$}{
+        \Dist$[v] \leftarrow alt$\;
+        \Prev$[v] \leftarrow u$\;
+        \DecreaseKey{\Queue, $v$, $alt$}\tcp*{Update priority in the queue}
+      }
+    }
+  }
+  \BlankLine
+  \Return{\Dist, \Prev}\;
+\end{algorithm}

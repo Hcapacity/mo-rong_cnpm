@@ -1,0 +1,48 @@
+\ProvidesPackage{codespace}
+
+\RequirePackage{fonts}
+\RequirePackage{xcolor}
+\RequirePackage{tcolorbox}
+\tcbuselibrary{minted,breakable}
+
+% Define colors
+\definecolor{cyan}{cmyk}{1,0,0,0}
+
+% Customize line number style
+\renewcommand{\theFancyVerbLine}{%
+  \goudysans\textcolor[RGB]{114, 114, 114}{\arabic{FancyVerbLine}}%
+}
+
+\setminted{
+  fontfamily=lcd,
+  linenos,
+  numbersep=8pt,
+  baselinestretch=1.2,
+  %
+  autogobble,
+  fontsize=auto,
+  breaklines,
+  breakanywhere,
+  breaksymbolleft=\raisebox{0.35ex}{\tiny\textcolor{red}{\ensuremath{\hookrightarrow}}},
+  breaksymbolindent=0pt,
+  breaksymbolsepleft=5pt,
+  style=abap,
+}
+
+\newtcblisting{code}[2][]{
+  listing engine=minted,
+  minted language=#2,
+  minted options={#1},
+  breakable,
+  before skip=\baselineskip,
+  after skip=\baselineskip,
+  left=20pt,
+  right=10pt,
+  top=8pt,
+  bottom=8pt,
+  boxrule=0.6pt,
+  colframe=cyan!75!black,
+  colback=cyan!5!white,
+  arc=4pt,
+  listing only,
+}

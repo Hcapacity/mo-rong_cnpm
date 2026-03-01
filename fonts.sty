@@ -1,0 +1,16 @@
+\ProvidesPackage{fonts}
+\RequirePackage{fontspec}
+
+% Path helpers for custom fonts (ensure the files exist in these folders)
+\newcommand\fontpath{fonts/}
+\newcommand\lcdpath{fonts/lcd/}
+
+% Goudy Sans Pro Black font (expects fonts/Goudy_Sans_Pro_Black.otf)
+\newfontfamily\goudysans[Path=\fontpath,Extension=.otf]{Goudy_Sans_Pro_Black}
+
+\newfontfamily\lcdfont[Path=\lcdpath,Extension=.TTF,
+  NFSSFamily=lcd,
+  UprightFont=LSANS,
+  BoldFont=LSANSD,
+  ItalicFont=LSANSI,
+  BoldItalicFont=LSANSDI]{LSANS}
