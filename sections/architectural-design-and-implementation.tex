@@ -1,13 +1,14 @@
-\section{Architectural Design and Implementation with Code Quality}
+\section{Architectural Design}
 Translating the abstract UML models into a functioning codebase requires the selection of an overarching architectural pattern. The SERS application utilizes the Model-View-Controller (MVC) paradigm, heavily augmented by an asynchronous message-brokering layer. The MVC pattern enforces a rigorous separation of concerns. The Model layer encapsulates all business logic, data validation, and database interactions. The View layer is strictly confined to presentation logistics, rendering the user interface and accepting input. The Controller acts as the central orchestrator, receiving HTTP requests from the View, commanding the Model to update its state, and managing the application flow.
 
 However, standard MVC is fundamentally synchronous; a Controller typically blocks the server thread until a task completes. For a reminder system, holding an HTTP connection open for three days until a scheduled event occurs is architecturally catastrophic. Therefore, the technology stack is designed to offload temporal logic. The backend Controller and Model are constructed using Python and the Flask framework. Data is persisted using an SQLite database (capable of scaling to PostgreSQL) mapped via SQLAlchemy. Crucially, the asynchronous layer utilizes Celery as the task queue manager and Redis as the in-memory message broker. When the Flask Controller receives a scheduling request, it pushes the task parameters into the Redis broker and immediately responds to the user. Independent Celery worker processes continuously monitor the Redis broker, executing the tasks only when their specific temporal conditions are met.
 
-This theoretical architecture is demonstrated in the following Python implementation snippet, which encapsulates the Controller logic and the Celery background worker.
+\section{Implementation \& Code Quality}
+The theoretical architecture is demonstrated in the following Python implementation snippet, which encapsulates the Controller logic and the Celery background worker.
 
 \codefile{python}{code/code.py}
 
- The inspection process focuses on identifying Code Smells—structural indicators of poor design that, while not necessarily preventing the program from functioning, significantly increase technical debt and the probability of future catastrophic failures.
+The inspection process focuses on identifying Code Smells—structural indicators of poor design that, while not necessarily preventing the program from functioning, significantly increase technical debt and the probability of future catastrophic failures.
 
 \begin{table}
 	\centering
