@@ -1,0 +1,36 @@
+\section{Architectural Design and Implementation with Code Quality}
+Translating the abstract UML models into a functioning codebase requires the selection of an overarching architectural pattern. The SERS application utilizes the Model-View-Controller (MVC) paradigm, heavily augmented by an asynchronous message-brokering layer. The MVC pattern enforces a rigorous separation of concerns. The Model layer encapsulates all business logic, data validation, and database interactions. The View layer is strictly confined to presentation logistics, rendering the user interface and accepting input. The Controller acts as the central orchestrator, receiving HTTP requests from the View, commanding the Model to update its state, and managing the application flow.
+
+However, standard MVC is fundamentally synchronous; a Controller typically blocks the server thread until a task completes. For a reminder system, holding an HTTP connection open for three days until a scheduled event occurs is architecturally catastrophic. Therefore, the technology stack is designed to offload temporal logic. The backend Controller and Model are constructed using Python and the Flask framework. Data is persisted using an SQLite database (capable of scaling to PostgreSQL) mapped via SQLAlchemy. Crucially, the asynchronous layer utilizes Celery as the task queue manager and Redis as the in-memory message broker. When the Flask Controller receives a scheduling request, it pushes the task parameters into the Redis broker and immediately responds to the user. Independent Celery worker processes continuously monitor the Redis broker, executing the tasks only when their specific temporal conditions are met.
+
+This theoretical architecture is demonstrated in the following Python implementation snippet, which encapsulates the Controller logic and the Celery background worker.
+
+\codefile{python}{code/code.py}
+
+ The inspection process focuses on identifying Code Smells—structural indicators of poor design that, while not necessarily preventing the program from functioning, significantly increase technical debt and the probability of future catastrophic failures.
+
+\begin{table}
+	\centering
+	\caption{Identified Code Smells and Refactoring Strategies}
+	\label{tab:identified-code-smells-refactoring}
+	\renewcommand{\arraystretch}{1.3}
+	\begin{tabular}{|>{\raggedright\arraybackslash}p{0.22\textwidth}|>{\raggedright\arraybackslash}p{0.35\textwidth}|>{\raggedright\arraybackslash}p{0.35\textwidth}|}
+		\hline
+		\textbf{Identified Code Smell Category} & \textbf{Technical Description and Observation} & \textbf{Proposed Refactoring Strategy} \\
+		\hline
+		Bloater: Long Method &
+		The \texttt{schedule\_new\_event} method handles input validation, database instantiation, complex mathematical time calculations, and asynchronous message brokering simultaneously. It violates the Single Responsibility Principle by attempting to manage too many disparate layers of logic.3 &
+		Extract Method: The mathematical calculation of the temporal offset and the actual dispatching to the Celery broker should be abstracted into a private helper function (e.g., \texttt{\_dispatch\_to\_broker()}). This isolates the temporal logic, making the primary method vastly more readable and testable.3 \\
+		\hline
+		Object-Orientation Abuser: Primitive Obsession &
+		Passing discrete primitive variables (\texttt{title}, \texttt{event\_timestamp}, \texttt{target\_email}, \texttt{offset\_minutes}) linearly through multiple architectural layers heavily clutters the method signatures, resulting in Long Parameter Lists and code duplication.49 &
+		Introduce Parameter Object: The isolated primitives should be grouped into a single cohesive Data Transfer Object (DTO) or a formalized validation model (such as a Pydantic schema). Passing a single \texttt{EventPayload} object ensures strict type safety across boundaries.3 \\
+		\hline
+		Concurrency Anti-Pattern: Unsafe Logging &
+		Utilizing \texttt{open("system\_delivery\_logs.txt", "a")} directly within the asynchronous worker is highly dangerous. If multiple Celery workers attempt to append to the same text file simultaneously, it will result in file lock collision errors and lost data. &
+		Implementation Refactor: Remove raw file I/O operations from background workers. Replace with a thread-safe Python logging module configuration or route logs through a secondary stream processing broker. \\
+		\hline
+	\end{tabular}
+\end{table}
+
+ 
