@@ -1,0 +1,144 @@
+\section{Software Testing and Quality Assurance}
+The purpose of testing in SERS is to verify that the most important user-facing and system-level behaviors work correctly before the report is finalized. Based on the requirements in Workstream 1 and the MVC plus asynchronous architecture described in Workstream 4, the team selected three key behaviors for validation: creating an event, calculating and scheduling a reminder, and revoking a reminder when an event is deleted. These behaviors directly support the core user stories US-01, US-02, and US-04, and they also cover the highest-risk logic in the current design.
+
+The scope of testing is limited to the conceptual backend flow presented in the code sample: controller validation, event persistence, reminder time calculation, and interaction with the asynchronous task queue. Full end-to-end delivery through a live SMTP provider is outside the scope of this assignment because the project emphasizes process and documentation rather than production deployment. Therefore, notification delivery is validated through mocked or simulated execution results rather than external email transmission.
+
+\subsection{Test Plan}
+\begin{xltabular}{\textwidth}{|>{\raggedright\arraybackslash\hyphenpenalty=10000\exhyphenpenalty=10000}p{0.24\textwidth}|>{\raggedright\arraybackslash\hyphenpenalty=10000\exhyphenpenalty=10000}X|>{\raggedright\arraybackslash\hyphenpenalty=10000\exhyphenpenalty=10000}p{0.18\textwidth}|>{\raggedright\arraybackslash\hyphenpenalty=10000\exhyphenpenalty=10000}p{0.16\textwidth}|}
+    \caption{Test Plan for Key SERS Functions} \label{tab:test-plan} \\
+    \hline
+    \textbf{Test Item} & \textbf{Objective} & \textbf{Test Level} & \textbf{Method} \\
+    \hline
+    \endfirsthead
+
+    \multicolumn{4}{c}%
+    {{\bfseries \tablename\ \thetable{} -- continued from previous page}} \\
+    \hline
+    \textbf{Test Item} & \textbf{Objective} & \textbf{Test Level} & \textbf{Method} \\
+    \hline
+    \endhead
+
+    \hline
+    \multicolumn{4}{|r|}{{Continued on next page}} \\
+    \hline
+    \endfoot
+
+    \hline
+    \endlastfoot
+
+    Create event (US-01, FR-01) &
+    Verify that valid event data is accepted, stored, and returned correctly by the controller layer. &
+    System &
+    Black-box \\
+    \hline
+    Schedule reminder (US-02, FR-03, FR-04) &
+    Verify that the system computes the reminder trigger time correctly and registers the asynchronous task without blocking the main flow. &
+    Unit / Integration &
+    White-box \\
+    \hline
+    Delete event and revoke task (US-04, FR-01, FR-04) &
+    Verify that deleting an event removes the database record and revokes the corresponding queued reminder task. &
+    Integration / System &
+    Black-box \\
+    \hline
+\end{xltabular}
+
+\subsection{Test Cases}
+\begin{xltabular}{\textwidth}{|>{\raggedright\arraybackslash\hyphenpenalty=10000\exhyphenpenalty=10000}p{0.1\textwidth}|>{\raggedright\arraybackslash\hyphenpenalty=10000\exhyphenpenalty=10000}p{0.2\textwidth}|>{\raggedright\arraybackslash\hyphenpenalty=10000\exhyphenpenalty=10000}X|>{\raggedright\arraybackslash\hyphenpenalty=10000\exhyphenpenalty=10000}X|>{\raggedright\arraybackslash\hyphenpenalty=10000\exhyphenpenalty=10000}p{0.14\textwidth}|}
+    \caption{Representative Test Cases} \label{tab:test-cases} \\
+    \hline
+    \textbf{Test ID} & \textbf{Description} & \textbf{Input} & \textbf{Expected Output} & \textbf{Test Type} \\
+    \hline
+    \endfirsthead
+
+    \multicolumn{5}{c}%
+    {{\bfseries \tablename\ \thetable{} -- continued from previous page}} \\
+    \hline
+    \textbf{Test ID} & \textbf{Description} & \textbf{Input} & \textbf{Expected Output} & \textbf{Test Type} \\
+    \hline
+    \endhead
+
+    \hline
+    \multicolumn{5}{|r|}{{Continued on next page}} \\
+    \hline
+    \endfoot
+
+    \hline
+    \endlastfoot
+
+    T1 &
+    Create event with valid data &
+    Title = ``Architecture Sync''; Event time = future timestamp; Email = ``admin@sers.local''; Offset = 15 minutes &
+    The controller accepts the request, stores the event in the database, schedules a reminder task, and returns a valid event identifier. &
+    Black-box \\
+    \hline
+    T2 &
+    Reject event with missing required title &
+    Title = empty string; Event time = future timestamp; Email = ``admin@sers.local''; Offset = 15 minutes &
+    The system raises a validation error and no event record is committed to the database. &
+    Black-box \\
+    \hline
+    T3 &
+    Verify reminder trigger calculation &
+    Event time = 10:00 UTC; Offset = 15 minutes; Simulated current time = 09:40 UTC &
+    The computed reminder trigger is 09:45 UTC, and the task is submitted to the queue with the correct execution time. &
+    White-box \\
+    \hline
+    T4 &
+    Reject event scheduled in the past &
+    Title = ``Retrospective''; Event time = past timestamp; Email = ``admin@sers.local''; Offset = 10 minutes &
+    The controller raises a temporal validation error because events must be scheduled in the future. &
+    White-box \\
+    \hline
+    T5 &
+    Delete event and revoke queued reminder &
+    Invoke \texttt{revoke\_existing\_event(entity\_id)} for an existing scheduled event &
+    The event is deleted from the database and the associated Celery task ID is revoked so the reminder is not dispatched later. &
+    System \\
+    \hline
+\end{xltabular}
+
+\subsection{Quality Assurance Discussion}
+Quality assurance in this project is not limited to running test cases. It also includes checking whether the implementation remains consistent with the requirements, architecture, and code quality goals defined in the earlier workstreams. The team used the Requirements Traceability Matrix from Workstream 1 to ensure that each critical requirement is supported by at least one test case. For example, FR-01 is covered by T1, T2, and T5, while FR-03 and FR-04 are covered by T3 and T5. This traceability reduces the risk of implementing features that are not verified or testing behavior that is not tied to a requirement.
+
+From a code quality perspective, Workstream 4 already identified several risks in the implementation, including a long controller method, primitive obsession in the parameter list, and unsafe file logging in an asynchronous worker. These findings are also QA concerns because they affect testability, maintainability, and operational reliability. For that reason, the team recommends refactoring the controller into smaller units, introducing a validated data transfer object for event input, and replacing direct file writes with the standard logging module or a centralized logging service. These changes would make automated testing easier and would reduce defects caused by concurrency or inconsistent data handling.
+
+Although this report does not require a full executable test suite, the proposed automation strategy is straightforward. Unit tests can be implemented with \texttt{pytest} to validate controller logic and time calculations. Integration tests can use a temporary SQLite database and a mocked Celery interface to confirm that scheduling and revocation happen correctly. For time-dependent behavior, clock-mocking utilities such as \texttt{freezegun} can simulate future timestamps without waiting in real time, which is especially important for reminder systems.
+
+\section{Reflection and Retrospective}
+At the end of the project, the team conducted a short retrospective to evaluate both technical execution and collaboration. Because the project was divided into parallel workstreams, the discussion focused on coordination quality, handoff clarity, and how well shared artifacts such as requirements, diagrams, and code samples supported integration.
+
+\begin{xltabular}{\textwidth}{|>{\raggedright\arraybackslash\hyphenpenalty=10000\exhyphenpenalty=10000}p{0.2\textwidth}|>{\raggedright\arraybackslash\hyphenpenalty=10000\exhyphenpenalty=10000}X|}
+    \caption{Start / Stop / Continue Retrospective} \label{tab:retrospective} \\
+    \hline
+    \textbf{Category} & \textbf{Team Reflection} \\
+    \hline
+    \endfirsthead
+
+    \multicolumn{2}{c}%
+    {{\bfseries \tablename\ \thetable{} -- continued from previous page}} \\
+    \hline
+    \textbf{Category} & \textbf{Team Reflection} \\
+    \hline
+    \endhead
+
+    \hline
+    \multicolumn{2}{|r|}{{Continued on next page}} \\
+    \hline
+    \endfoot
+
+    \hline
+    \endlastfoot
+
+    Start &
+    Begin each sprint with a more explicit interface agreement, especially for event data format, datetime handling, and reminder parameters. This would reduce rework between requirements, architecture, implementation, and testing tasks. \\
+    \hline
+    Stop &
+    Stop making isolated assumptions about shared components without confirming them with the rest of the team. In particular, asynchronous behavior and validation rules must be agreed on early to avoid inconsistencies across sections of the report. \\
+    \hline
+    Continue &
+    Continue using shared UML diagrams, backlog planning, and peer review. These practices helped the team stay aligned and made it easier to connect requirements, architecture, code quality, and testing in one coherent report. \\
+    \hline
+\end{xltabular}
+
+Overall, the team learned that even a small reminder system becomes significantly more complex once asynchronous behavior is introduced. The project highlighted the importance of clear requirements, realistic scope control, and consistent communication between parallel workstreams. It also reinforced several practical software engineering lessons: estimate risk early, define shared interfaces before implementation, and treat testing as a design activity rather than a final checklist. These insights are directly applicable to future collaborative software projects.
