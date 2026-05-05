@@ -1,0 +1,170 @@
+\section{Requirement Engeneering}
+\subsection{Stakeholder Identification}
+The initial phase involves identifying all entities that interact with, benefit from, or govern the software application.
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{User:} The primary human consumer of the application who interfaces with the graphical user interface to manage calendar events.
+
+    \item \textbf{System Administrator:} An operational overseer equipped with elevated privileges, responsible for managing accounts, monitoring system health, and resolving data conflicts.
+
+    \item \textbf{Notification Service:} An internal programmatic actor or external third-party integration (like an SMTP server or SMS gateway) that routes and delivers asynchronous reminders.
+
+    \item \textbf{Project Engineering Team:} The five-member technical unit responsible for designing, implementing, verifying, and maintaining the system architecture.
+
+    \item \textbf{Instructor:} The governing authority responsible for evaluating the fidelity of the software engineering process and documentation.
+\end{itemize}
+\subsection{Functional Requirement(FRs)}
+Functional requirements define the explicit behaviors and data processing operations the system must execute
+\begin{itemize}[leftmargin=*]
+    \item \textbf{FR-01: Event Lifecycle Management}: The system must enable an authenticated user to create, read, update, and delete (CRUD) event entries, enforcing a valid future date and time parameter.
+
+
+    \item \textbf{FR-02: Metadata Association}: The system must allow users to append optional metadata, specifically expanded textual descriptions and geographical location data.
+
+
+    \item \textbf{FR-03: Alert Schedule Calculation}: The system must calculate a specific notification trigger timestamp based on the user-defined reminder interval subtracted from the primary event timestamp.
+
+
+    \item \textbf{FR-04: Asynchronous Alert Execution}: The system must asynchronously dispatch the reminder via the Notification Service at the calculated trigger timestamp without blocking the main application thread.
+
+
+    \item \textbf{FR-05: User Authentication Protocol}: The system must authenticate users via secure credentials to ensure event data is strongly siloed.
+
+
+    \item \textbf{FR-06: Event Sharing Interface}: The system should provide a mechanism allowing a user to share event details or digitally invite other registered users.
+\end{itemize}
+\subsection{Non-Functional Requirements (NFRs)}
+Non-functional requirements act as systemic constraints, dictating how the system must behave under various operational loads
+\begin{itemize}[leftmargin=*]
+    \item \textbf{NFR-01: Performance and Latency}: The graphical user interface must respond to synchronous user inputs (e.g., saving a new event) in under 1,000 milliseconds to prevent user frustration.
+
+
+    \item \textbf{NFR-02: System Scalability}: The asynchronous notification engine must be linearly scalable, capable of processing up to 50,000 asynchronous notifications per day without degrading the primary web server's performance.
+
+
+    \item \textbf{NFR-03: Reliability and Availability}: The application infrastructure must maintain an operational uptime of 99.9%, as downtime directly correlates to missed notifications (a critical failure).
+\end{itemize}
+% ==========================================
+% 4. User Stories & Acceptance Criteria
+% ==========================================
+\subsection{User Stories \& Acceptance Criteria}
+
+User stories utilize a standard human-centric narrative format: ``As a [type of user], I want [objective] so that [benefit]''. Each story is accompanied by explicit Acceptance Criteria to define the conditions for completion. % [cite: 31, 32]
+
+\begin{itemize}
+    \item \textbf{US-01: Create Event}
+          \begin{itemize}
+              \item \textbf{User Story:} As a user, I want to create a new event with a title, date, and time, so that I can maintain an accurate digital record of my upcoming appointments.
+              \item \textbf{Acceptance Criteria:}
+                    \begin{enumerate}
+                        \item The input form cryptographically and logically validates the title, date, and time.
+                        \item The event object successfully persists to the database.
+                        \item The graphical interface displays a success confirmation modal.
+                    \end{enumerate}
+          \end{itemize}
+
+    \item \textbf{US-02: Schedule Reminder}
+          \begin{itemize}
+              \item \textbf{User Story:} As a user, I want to set a specific reminder time interval prior to an event, so that I am alerted automatically before the occurrence begins.
+              \item \textbf{Acceptance Criteria:}
+                    \begin{enumerate}
+                        \item The system interface accepts numerical time intervals.
+                        \item The backend mathematical engine calculates the exact trigger time.
+                        \item The background scheduler successfully registers the task in the message broker queue.
+                    \end{enumerate}
+          \end{itemize}
+
+    \item \textbf{US-03: Edit Event}
+          \begin{itemize}
+              \item \textbf{User Story:} As a user, I want to edit an existing event's specific details, so that my schedule remains accurate if locations or times change unexpectedly.
+              \item \textbf{Acceptance Criteria:}
+                    \begin{enumerate}
+                        \item The user can retrieve and populate an existing event into the input form.
+                        \item Modifications overwrite the existing database record.
+                        \item Any previously scheduled reminder triggers associated with the old time are successfully revoked and replaced.
+                    \end{enumerate}
+          \end{itemize}
+
+    \item \textbf{US-04: Delete Event}
+          \begin{itemize}
+              \item \textbf{User Story:} As a user, I want to delete a canceled event entirely, so that my application dashboard remains uncluttered and accurate.
+              \item \textbf{Acceptance Criteria:}
+                    \begin{enumerate}
+                        \item The deletion command removes the event from the client view.
+                        \item The corresponding database record is permanently dropped.
+                        \item All pending notification tasks associated with the event ID are aborted in the background queue.
+                    \end{enumerate}
+          \end{itemize}
+
+    \item \textbf{US-05: View System Logs}
+          \begin{itemize}
+              \item \textbf{User Story:} As an administrator, I want to view system logs for failed notification deliveries, so that I can troubleshoot infrastructure or SMTP delivery issues proactively.
+              \item \textbf{Acceptance Criteria:}
+                    \begin{enumerate}
+                        \item The secure administrator dashboard queries and displays error logs.
+                        \item The log entries explicitly indicate the failed event ID, the target user, and the failure timestamp.
+                    \end{enumerate}
+          \end{itemize}
+\end{itemize}
+
+\vspace{1em} % Adds some spacing between the two sections
+
+% ==========================================
+% 5. MoSCoW Prioritization Framework
+% ==========================================
+\subsection{MoSCoW Prioritization Framework}
+
+To prevent scope creep and ensure the delivery of a Minimum Viable Product (MVP), the team utilizes the MoSCoW prioritization framework. % [cite: 36]
+
+\begin{description}
+    \item[Must Have:] Features vital to the system's existence. This includes basic event creation, event deletion, logical reminder scheduling, and the asynchronous dispatch of the notification. Without these, SERS fails to function as a reminder application. % [cite: 39]
+
+    \item[Should Have:] Important features that add significant value but are not strictly existential. This includes event editing, recurring event configurations, and the ability to set multiple reminder intervals (e.g., an alert one hour prior, and another ten minutes prior).
+
+    \item[Could Have:] Desirable enhancements that will only be addressed if sprint capacity permits. This encompasses the optional functionality of inviting other users, sharing events via direct email links, and automated workflow suggestions based on calendar availability.
+
+    \item[Won't Have (This Iteration):] Complex functionalities explicitly deferred to future releases. This includes integration with third-party proprietary calendars (e.g., Google Calendar APIs), complex geographical routing for travel time alerts, and AI-driven predictive scheduling.
+\end{description}
+\subsection{Requirements Traceability Matrix (RTM)}
+The Requirements Traceability Matrix (RTM) mathematically proves that every functional requirement is tethered to a specific user story, which in turn maps to an architectural component and a definitive test case. This linkage guarantees that:
+
+\begin{itemize}
+    \item No orphaned code is written without a corresponding requirement.
+    \item No requirement is left untested.
+    \item Every architectural component has a clear functional justification.
+\end{itemize}
+
+\vspace{1em}
+
+\begin{table}[htbp]
+    \centering
+    \renewcommand{\arraystretch}{1.5} % Tăng khoảng cách giữa các dòng để không bị chữ dính vào nhau
+    \rowcolors{2}{gray!10}{white} % Tạo hiệu ứng màu nền xen kẽ (dòng xám nhạt, dòng trắng)
+    \begin{tabularx}{\textwidth}{
+        >{\raggedright\arraybackslash}p{2.8cm}
+        >{\raggedright\arraybackslash}p{3cm}
+        >{\raggedright\arraybackslash}X
+        >{\raggedright\arraybackslash}p{2cm}
+        }
+        \toprule
+        \rowcolor{gray!25} % Màu nền đậm hơn chút cho dòng tiêu đề
+        \textbf{Functional Req.}                    & \textbf{Correlated User Story} & \textbf{Primary Architectural Component}          & \textbf{Assigned Test ID} \\
+        \midrule
+
+        \textbf{FR-01} \newline (Event Lifecycle)   & US-01, US-03, US-04            & \texttt{EventController}, \texttt{EventModel}     & T1, T2                    \\
+
+        \textbf{FR-02} \newline (Metadata)          & US-01                          & \texttt{EventModel}, \texttt{MetadataField}       & T1                        \\
+
+        \textbf{FR-03} \newline (Alert Calculation) & US-02                          & \texttt{SchedulerService}, \texttt{TaskQueue}     & T3, T4                    \\
+
+        \textbf{FR-04} \newline (Async Dispatch)    & US-02                          & \texttt{NotificationWorker}, \texttt{SMTP Client} & T3, T5                    \\
+
+        \textbf{FR-05} \newline (Authentication)    & US-05                          & \texttt{AuthController}, \texttt{UserModel}       & T6                        \\
+
+        \textbf{FR-06} \newline (Event Sharing)     & US-05                          & \texttt{SharingService}, \texttt{InviteModel}     & T7                        \\
+
+        \bottomrule
+    \end{tabularx}
+    \caption{Requirements Traceability Matrix for SERS Project}
+    \label{tab:rtm}
+\end{table}
